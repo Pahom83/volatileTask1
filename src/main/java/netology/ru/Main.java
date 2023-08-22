@@ -1,7 +1,5 @@
 package netology.ru;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -20,28 +18,39 @@ public class Main {
 
         Thread thread1 = new Thread(() -> {
             for (String text : texts) {
-                if (text.length() == 3) {
-                    if (isMagic(text)){
+                if (isPalindrome(text)) {
+                    if (text.length() == 3) {
                         count3.getAndAdd(1);
+                    } else if (text.length() == 4) {
+                        count4.getAndAdd(1);
+                    } else {
+                        count5.getAndAdd(1);
                     }
                 }
             }
         });
         Thread thread2 = new Thread(() -> {
             for (String text : texts) {
-                if (text.length() == 4) {
-                    if (isMagic(text)){
+                if (isOneChar(text)) {
+                    if (text.length() == 3) {
+                        count3.getAndAdd(1);
+                    } else if (text.length() == 4) {
                         count4.getAndAdd(1);
+                    } else {
+                        count5.getAndAdd(1);
                     }
                 }
             }
         });
         Thread thread3 = new Thread(() -> {
             for (String text : texts) {
-                if (text.length() == 5) {
-                    if (isMagic(text)){
+                if (isMagic(text)) {
+                    if (text.length() == 3) {
+                        count3.getAndAdd(1);
+                    } else if (text.length() == 4) {
+                        count4.getAndAdd(1);
+                    } else {
                         count5.getAndAdd(1);
-
                     }
                 }
             }
@@ -52,7 +61,6 @@ public class Main {
         thread1.join();
         thread2.join();
         thread3.join();
-
         System.out.println("Красивых слов с длиной 3: " + count3.toString() + "шт.");
         System.out.println("Красивых слов с длиной 4: " + count4.toString() + "шт.");
         System.out.println("Красивых слов с длиной 5: " + count5.toString() + "шт.");
@@ -67,29 +75,35 @@ public class Main {
         return text.toString();
     }
 
-    static boolean isMagic(String word){
-        if (isPalindrome(word)){
-            return true;
-        } else if (isOneChar(word)){
-            return true; // можно дописать еще несколько условий
-        } else {
-            return false;
+    static boolean isMagic(String word) {
+        int length = word.length();
+        int count = 0;
+        for (int i = 0; i < length; i++) {
+            if (i + 1 < length) {
+                // Проверяем, является ли текущий символ меньшим или равным следующему
+                if (word.charAt(i) <= word.charAt(i + 1)) {
+                    count++;
+                }
+            }
         }
+        if (count == length - 1) {
+            // Проверяем, не являются ли все символы слова одинаковыми
+            return !isOneChar(word);
+        }
+        return false;
     }
 
     private static boolean isOneChar(String word) {
         int length = word.length();
-        char one = word.charAt(0);
+        char first = word.charAt(0);
         int count = 0;
-        for (int i = 1; i < length; i++){
-            if (one == word.charAt(i)){
+        for (int i = 1; i < length; i++) { //первую букву не проверяем, так как она исходная
+            if (first == word.charAt(i)) {
                 count++;
             }
         }
-        if (count == word.length()){
-            return true;
-        }
-        return false;
+        // Добавляем к счетчику 1, т.к. первую букву мы не проверяли
+        return count + 1 == word.length();
     }
 
     static boolean isPalindrome(String word) {
